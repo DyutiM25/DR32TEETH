@@ -1,4 +1,6 @@
 import SampleImage from "../../assets/images/sample.jpeg";
+import SampleImage2 from "../../assets/images/sample2.jpg";
+import SampleImage3 from "../../assets/images/sample3.jpg";
 import Hero1 from "../../assets/images/hero-1.png";
 
 const Hero = () => {
@@ -54,12 +56,12 @@ const Hero = () => {
         {/* Right Stacked Small Images */}
         <div className="w-1/3 flex flex-col gap-3 sm:gap-4">
           <img
-            src={SampleImage}
+            src={SampleImage2}
             alt="Chair Image"
             className="w-full h-[118px] sm:h-[150px] md:h-[190px] lg:h-[240px] object-cover rounded-xl shadow-md"
           />
           <img
-            src={SampleImage}
+            src={SampleImage3}
             alt="Award Image"
             className="w-full h-[118px] sm:h-[150px] md:h-[190px] lg:h-[240px] object-cover rounded-xl shadow-md"
           />
