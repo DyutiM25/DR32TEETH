@@ -12,7 +12,7 @@ const TeamCard = ({name, title, description, image}) => {
         />
       )}
       <p className="text-lg md:text-xl font-semibold mb-1 md:mb-2 text-teal-700">{name}</p>
-      <h5 className="text-base md:text-lg font-semibold mb-2 text-teal-700">{title}</h5>
+      <h5 className="text-sm md:text-sm font-semibold mb-2 text-teal-700">{title}</h5>
       <p className="text-gray-600 text-xs md:text-sm">{description}</p>
       <button className="text-xs md:text-sm cursor-pointer hover:underline pt-2 mt-3" onClick={handleClick}>Know More</button>
     </div>
