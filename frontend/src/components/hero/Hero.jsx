@@ -1,6 +1,6 @@
-import SampleImage from "../../assets/images/sample.jpeg";
-import SampleImage2 from "../../assets/images/sample2.jpg";
-import SampleImage3 from "../../assets/images/sample3.jpg";
+import SampleImage from "../../assets/images/sample3.jpg";
+import SampleImage2 from "../../assets/images/dr-sl.jpg";
+import SampleImage3 from "../../assets/images/drak.jpg";
 import Hero1 from "../../assets/images/hero-1.png";
 
 const Hero = () => {
