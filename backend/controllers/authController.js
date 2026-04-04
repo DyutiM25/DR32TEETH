@@ -60,22 +60,7 @@ export const sendOtp = async (req, res) => {
 // 2) verify OTP -> authenticate, set cookie
 export const verifyOtp = async (req, res) => {
   try {
-    const {
-      email,
-      otp,
-      firstName,
-      lastName,
-      dob,
-      gender,
-      bloodGroup,
-      phone,
-      address,
-      city,
-      state,
-      zip,
-      role,
-      patientId,
-    } = req.body;
+    const { email, otp } = req.body;
 
     if (!email || !otp)
       return res.status(400).json({ error: "Email and OTP are required" });
@@ -86,47 +71,17 @@ export const verifyOtp = async (req, res) => {
       return res.status(400).json({ error: "OTP expired or not found" });
     if (stored !== otp) return res.status(400).json({ error: "Invalid OTP" });
 
-    // OTP valid -> find user
+    // OTP valid -> find or create user
     let user = await User.findOne({ where: { email } });
+    let isNewUser = false;
 
-    // If user doesn't exist -> signup
+    // If user doesn't exist -> auto-create with just email
     if (!user) {
-      // Validate required signup fields
-      const missingFields = [];
-      if (!firstName) missingFields.push("firstName");
-      if (!lastName) missingFields.push("lastName");
-      if (!dob) missingFields.push("dob");
-      if (!gender) missingFields.push("gender");
-      if (!bloodGroup) missingFields.push("bloodGroup");
-      if (!phone) missingFields.push("phone");
-      if (!address) missingFields.push("address");
-      if (!city) missingFields.push("city");
-      if (!state) missingFields.push("state");
-      if (!zip) missingFields.push("zip");
-
-      if (missingFields.length > 0)
-        return res.status(400).json({
-          error: `Missing required fields for signup: ${missingFields.join(
-            ", "
-          )}`,
-        });
-
-      // Create new user
       user = await User.create({
-        firstName,
-        lastName,
-        dob,
-        gender,
-        bloodGroup,
-        phone,
-        address,
-        city,
-        state,
-        zip,
         email,
-        role: role || "patient",
-        patientId,
+        role: "patient",
       });
+      isNewUser = true;
     }
 
     // Generate JWT
@@ -139,19 +94,99 @@ export const verifyOtp = async (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     };
     res.cookie("token", accessToken, cookieOptions);
 
-    res.json({ message: "Logged in successfully", user });
+    res.json({
+      message: isNewUser
+        ? "Account created successfully"
+        : "Logged in successfully",
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        profileCompleted: user.profileCompleted,
+      },
+      isNewUser,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Verify failed" });
   }
 };
 
-// 3) logout
+// 3) get profile (protected)
+export const getProfile = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        gender: user.gender,
+        bloodGroup: user.bloodGroup,
+        phone: user.phone,
+        role: user.role,
+        profileCompleted: user.profileCompleted,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch profile" });
+  }
+};
+
+// 4) update profile (protected)
+export const updateProfile = async (req, res) => {
+  try {
+    const { firstName, lastName, gender, bloodGroup, phone } = req.body;
+
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Update fields
+    if (firstName !== undefined) user.firstName = firstName;
+    if (lastName !== undefined) user.lastName = lastName;
+    if (gender !== undefined) user.gender = gender;
+    if (bloodGroup !== undefined) user.bloodGroup = bloodGroup;
+    if (phone !== undefined) user.phone = phone;
+
+    // Mark profile as completed if key fields are filled
+    if (user.firstName && user.lastName && user.phone) {
+      user.profileCompleted = true;
+    }
+
+    await user.save();
+
+    res.json({
+      message: "Profile updated successfully",
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        gender: user.gender,
+        bloodGroup: user.bloodGroup,
+        phone: user.phone,
+        role: user.role,
+        profileCompleted: user.profileCompleted,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update profile" });
+  }
+};
+
+// 5) logout
 export const logout = async (req, res) => {
   try {
     res.clearCookie(process.env.COOKIE_NAME || "token");
