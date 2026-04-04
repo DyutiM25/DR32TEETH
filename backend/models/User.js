@@ -1,5 +1,5 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/db";
+import { DataTypes } from "@sequelize/core";
+import { sequelize } from "../config/db.js";
 
 const User = sequelize.define("User", {
   id: {
@@ -10,60 +10,36 @@ const User = sequelize.define("User", {
   },
   firstName: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   lastName: {
     type: DataTypes.STRING,
-    allowNull: false,
-  },
-  dob: {
-    type: DataTypes.DATEONLY,
-    allowNull: false,
+    allowNull: true,
   },
   gender: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   bloodGroup: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   phone: {
     type: DataTypes.STRING,
-    allowNull: false,
-  },
-  address: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  city: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  state: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  zip: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
   },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
   role: {
     type: DataTypes.ENUM("patient", "doctor"),
     defaultValue: "patient",
   },
-  patientId: {
-    type: DataTypes.STRING,
-    unique: true,
+  profileCompleted: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
 });
 

@@ -5,7 +5,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const[loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -23,21 +23,21 @@ export const AuthProvider = ({ children }) => {
         fetchProfile();
     }, []);
 
-    const login = async (identifier, password) => {
-        const res = await api.post("/auth/login", {identifier, password});
+    const login = async (email, otp) => {
+        const res = await api.post("/auth/verify-otp", { email, otp });
         setUser(res.data.user);
-    }
+        return res.data;
+    };
 
-    const logout = async () =>
-    {
-        awaitapi.post("/auth/logout");
+    const logout = async () => {
+        await api.post("/auth/logout");
         setUser(null);
-    }
+    };
 
-    return(
-        <AuthContext.Provider value={{user, setUser, login, logout, loading}}>
+    return (
+        <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
             {children}
-            </AuthContext.Provider>
+        </AuthContext.Provider>
     );
 };
 
