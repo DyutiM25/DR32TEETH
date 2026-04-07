@@ -1,26 +1,16 @@
-import { Sequelize } from '@sequelize/core';
-import { MySqlDialect } from '@sequelize/mysql';
+import { PrismaClient } from '@prisma/client';
 
-const sequelize = new Sequelize({
-  dialect: MySqlDialect,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '3306', 10),
-});
+const prisma = new PrismaClient();
 
 const connectDB = async () => {
   try {
-    await sequelize.authenticate();
-    console.log('MySQL database connected successfully.');
-    await sequelize.sync();
-    console.log('All models synchronized.');
+    await prisma.$connect();
+    console.log('Prisma connected successfully to the database.');
   } catch (error) {
-    console.error('Unable to connect to the database:', error.message);
+    console.error('Unable to connect to the database via Prisma:', error.message);
     process.exit(1);
   }
 };
 
-export { sequelize };
+export { prisma };
 export default connectDB;

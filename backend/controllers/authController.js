@@ -1,7 +1,7 @@
 import { createClient } from "redis";
 import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import { prisma } from "../config/db.js";
 import { sendOtpEmail } from "../utils/email.js";
 import dotenv from "dotenv";
 
@@ -72,14 +72,16 @@ export const verifyOtp = async (req, res) => {
     if (stored !== otp) return res.status(400).json({ error: "Invalid OTP" });
 
     // OTP valid -> find or create user
-    let user = await User.findOne({ where: { email } });
+    let user = await prisma.user.findUnique({ where: { email } });
     let isNewUser = false;
 
     // If user doesn't exist -> auto-create with just email
     if (!user) {
-      user = await User.create({
-        email,
-        role: "patient",
+      user = await prisma.user.create({
+        data: {
+          email,
+          role: "patient",
+        }
       });
       isNewUser = true;
     }
@@ -110,6 +112,7 @@ export const verifyOtp = async (req, res) => {
         lastName: user.lastName,
         role: user.role,
         profileCompleted: user.profileCompleted,
+        isApproved: user.isApproved,
       },
       isNewUser,
     });
@@ -122,7 +125,7 @@ export const verifyOtp = async (req, res) => {
 // 3) get profile (protected)
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id);
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
     if (!user) return res.status(404).json({ error: "User not found" });
 
     res.json({
@@ -136,6 +139,10 @@ export const getProfile = async (req, res) => {
         phone: user.phone,
         role: user.role,
         profileCompleted: user.profileCompleted,
+        isApproved: user.isApproved,
+        specialization: user.specialization,
+        qualification: user.qualification,
+        licenseNumber: user.licenseNumber,
       },
     });
   } catch (err) {
@@ -147,24 +154,34 @@ export const getProfile = async (req, res) => {
 // 4) update profile (protected)
 export const updateProfile = async (req, res) => {
   try {
-    const { firstName, lastName, gender, bloodGroup, phone } = req.body;
+    const { firstName, lastName, gender, bloodGroup, phone, specialization, qualification, licenseNumber } = req.body;
 
-    const user = await User.findByPk(req.user.id);
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    // Update fields
-    if (firstName !== undefined) user.firstName = firstName;
-    if (lastName !== undefined) user.lastName = lastName;
-    if (gender !== undefined) user.gender = gender;
-    if (bloodGroup !== undefined) user.bloodGroup = bloodGroup;
-    if (phone !== undefined) user.phone = phone;
+    const existingUser = await prisma.user.findUnique({ where: { id: req.user.id } });
+    if (!existingUser) return res.status(404).json({ error: "User not found" });
 
     // Mark profile as completed if key fields are filled
-    if (user.firstName && user.lastName && user.phone) {
-      user.profileCompleted = true;
+    const isCompleted = !!(firstName && lastName && phone) || existingUser.profileCompleted;
+
+    const updateData = {
+      firstName: firstName !== undefined ? firstName : undefined,
+      lastName: lastName !== undefined ? lastName : undefined,
+      gender: gender !== undefined ? gender : undefined,
+      bloodGroup: bloodGroup !== undefined ? bloodGroup : undefined,
+      phone: phone !== undefined ? phone : undefined,
+      profileCompleted: isCompleted
+    };
+
+    // Doctor-specific fields
+    if (existingUser.role === "doctor") {
+      if (specialization !== undefined) updateData.specialization = specialization;
+      if (qualification !== undefined) updateData.qualification = qualification;
+      if (licenseNumber !== undefined) updateData.licenseNumber = licenseNumber;
     }
 
-    await user.save();
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data: updateData
+    });
 
     res.json({
       message: "Profile updated successfully",
@@ -178,6 +195,10 @@ export const updateProfile = async (req, res) => {
         phone: user.phone,
         role: user.role,
         profileCompleted: user.profileCompleted,
+        isApproved: user.isApproved,
+        specialization: user.specialization,
+        qualification: user.qualification,
+        licenseNumber: user.licenseNumber,
       },
     });
   } catch (err) {
@@ -186,7 +207,52 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// 5) logout
+// 5) Register as doctor (patient requests role change)
+export const registerAsDoctor = async (req, res) => {
+  try {
+    const { specialization, qualification, licenseNumber } = req.body;
+
+    if (!specialization || !qualification || !licenseNumber) {
+      return res.status(400).json({ error: "Specialization, qualification, and license number are required" });
+    }
+
+    const existingUser = await prisma.user.findUnique({ where: { id: req.user.id } });
+    if (!existingUser) return res.status(404).json({ error: "User not found" });
+
+    if (existingUser.role === "doctor") {
+      return res.status(400).json({ error: "Already registered as a doctor" });
+    }
+
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data: {
+        role: "doctor",
+        isApproved: false,
+        specialization,
+        qualification,
+        licenseNumber
+      }
+    });
+
+    res.json({
+      message: "Doctor registration submitted. Pending admin approval.",
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        isApproved: user.isApproved,
+        specialization: user.specialization,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to register as doctor" });
+  }
+};
+
+// 6) logout
 export const logout = async (req, res) => {
   try {
     res.clearCookie(process.env.COOKIE_NAME || "token");

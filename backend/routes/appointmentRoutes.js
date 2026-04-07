@@ -1,24 +1,21 @@
-// import express from "express";
-// import { bookAppointment, getAppointments, updateAppointmentStatus, cancelAppointment } from "../controllers/appointmentController.js";
+import express from "express";
+import { verifyAccessToken } from "../middleware/authMiddleware.js";
+import { 
+    getDoctors, 
+    getAvailableSlots, 
+    bookAppointment, 
+    getMyAppointments,
+    updateAppointmentStatus,
+    getTodayAppointments
+} from "../controllers/appointmentController.js";
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.post('/book', protectRoute, restrictTo('patient'), bookAppointment);
-// router.get('/', protectRoute, getAppointments);
-// router.patch('/:id/status', protectRoute, restrictTo('doctor'), updateAppointmentStatus);
-// router.delete('/:id', protectRoute, restrictTo('patient'), cancelAppointment);
+router.get("/doctors", verifyAccessToken, getDoctors);
+router.get("/available-slots", verifyAccessToken, getAvailableSlots);
+router.post("/book", verifyAccessToken, bookAppointment);
+router.get("/my-appointments", verifyAccessToken, getMyAppointments);
+router.patch("/:id/status", verifyAccessToken, updateAppointmentStatus);
+router.get("/today", verifyAccessToken, getTodayAppointments);
 
-// export default router;
-
-// // {
-// //     "message": "User registered successfully",
-// //     "user": {
-// //         "firstName": "Srilatha",
-// //         "lastName": "I",
-// //         "email": "srilathadentist@gmail.com",
-// //         "role": "doctor",
-// //         "_id": "68e8625e90ebc04f81af8196"
-// //     },
-// //     "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTg2MjVlOTBlYmMwNGY4MWFmODE5NiIsImlhdCI6MTc2MDA1OTk5OSwiZXhwIjoxNzYwMDYwODk5fQ.RXFU4FQruekYdj0KuIuFMwDtZ-qXT_JHClbgL2rOwUw",
-// //     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTg2MjVlOTBlYmMwNGY4MWFmODE5NiIsImlhdCI6MTc2MDA1OTk5OSwiZXhwIjoxNzYwNjY0Nzk5fQ.tl4KlesgT-5Hp6hbLp4luWK0EIjotrPYb1MuX7Wa1cE"
-// // }
+export default router;
