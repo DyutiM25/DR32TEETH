@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 
 export async function sendOtpEmail(to, otp) {
   const msg = {
-    from: process.env.SMTP_USER,
+    from: "mengjidhanush@gmail.com",
     to,
     subject: "Your Login OTP",
     text: `Your OTP is ${otp}. It will expire in 5 minutes.`,
