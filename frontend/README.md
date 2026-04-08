@@ -1,16 +1,64 @@
-# React + Vite
+# DR32TEETH - Frontend Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the patient-facing and provider-facing web application for the DR32TEETH platform, built with React 19 and Vite.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Modern UI/UX**: Built with Tailwind CSS for a sleek, responsive, and accessible interface.
+- **Dynamic Dashboards**:
+  - **Patient Dashboard**: Manage appointments and view health records.
+  - **Doctor Dashboard**: Interactive schedule management and consultation tools.
+  - **Admin Dashboard**: System administration and user oversight.
+- **Real-time Feedback**: Integrated `react-hot-toast` for intuitive user notifications.
+- **Smooth Navigation**: Client-side routing with `React Router 7`.
+- **Carousel Components**: Enhanced visual experience using `react-slick`.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework**: React 19
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **HTTP Client**: Axios
+- **State Management**: React Context API
+- **Routing**: React Router 7
 
-## Expanding the ESLint configuration
+## 📂 Directory Structure
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```text
+frontend/
+├── src/
+│   ├── api/            # API service layers (Axios instances)
+│   ├── components/     # Reusable UI components
+│   ├── context/        # Global state management
+│   ├── pages/          # Page-level components (Admin, Doctor, Patient, etc.)
+│   ├── assets/         # Images, fonts, and global styles
+│   └── App.jsx         # Main application component
+├── tailwind.config.js  # Tailwind CSS configuration
+└── vite.config.js      # Vite configuration
+```
+
+## ⚙️ Setup & Installation
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Run Development Server**
+   ```bash
+   npm run dev
+   ```
+
+3. **Build for Production**
+   ```bash
+   npm run build
+   ```
+
+## 🎨 Styling
+
+The application uses Tailwind CSS. To modify the theme or add custom utilities, refer to `tailwind.config.js`.
+
+## 📄 License
+
+This project is licensed under the ISC License.
