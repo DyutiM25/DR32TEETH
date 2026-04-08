@@ -66,7 +66,7 @@ const LoginPage = () => {
       if (data.isNewUser || !data.user.profileCompleted) {
         navigate("/profile");
       } else {
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Invalid OTP. Please try again.");

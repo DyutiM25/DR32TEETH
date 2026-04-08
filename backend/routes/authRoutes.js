@@ -4,6 +4,7 @@ import {
   verifyOtp,
   getProfile,
   updateProfile,
+  registerAsDoctor,
   logout,
 } from "../controllers/authController.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
@@ -14,6 +15,7 @@ router.post("/send-otp", sendOtp);
 router.post("/verify-otp", verifyOtp);
 router.get("/profile", verifyAccessToken, getProfile);
 router.put("/profile", verifyAccessToken, updateProfile);
+router.post("/register-doctor", verifyAccessToken, registerAsDoctor);
 router.post("/logout", logout);
 
 export default router;
