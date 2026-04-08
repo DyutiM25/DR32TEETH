@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api/axios.js";
 import {
   Users,
-  UserCheck,
   Calendar,
   Activity,
   ShieldCheck,
@@ -263,25 +262,6 @@ const AdminDashboardPage = () => {
             <p className="text-sm font-bold text-gray-800 mt-1">{health?.uptime ? `${Math.floor(health.uptime / 60)}m` : "N/A"}</p>
           </div>
         </div>
-      </div>
-
-      {/* Quick Nav */}
-      <div className="grid grid-cols-3 gap-3">
-        <button onClick={() => navigate("/admin/approvals")} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md transition text-center">
-          <ShieldCheck size={28} className="text-purple-500 mx-auto mb-2" />
-          <span className="text-sm font-medium text-gray-700">Doctor Approvals</span>
-          {stats?.pendingDoctors > 0 && (
-            <span className="block text-xs text-red-500 font-bold mt-1">{stats.pendingDoctors} pending</span>
-          )}
-        </button>
-        <button onClick={() => navigate("/admin/users")} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md transition text-center">
-          <Users size={28} className="text-teal-500 mx-auto mb-2" />
-          <span className="text-sm font-medium text-gray-700">User Management</span>
-        </button>
-        <button onClick={() => navigate("/admin/analytics")} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md transition text-center">
-          <BarChart3 size={28} className="text-indigo-500 mx-auto mb-2" />
-          <span className="text-sm font-medium text-gray-700">Full Analytics</span>
-        </button>
       </div>
     </div>
   );

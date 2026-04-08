@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../../api/axios.js";
 import { FileText, Download, Pill, Calendar } from "lucide-react";
+import { downloadFile } from "../../utils/download.js";
 
 const PrescriptionsPage = () => {
   const [prescriptions, setPrescriptions] = useState([]);
@@ -79,15 +80,13 @@ const PrescriptionsPage = () => {
                         </p>
                       </div>
                     </div>
-                    <a
-                      href={`http://localhost:3000/api/prescriptions/${p.id}/pdf`}
-                      target="_blank"
-                      rel="noreferrer"
+                    <button
+                      onClick={() => downloadFile(`/prescriptions/${p.id}/pdf`, `prescription-${p.id.slice(0, 8)}.pdf`)}
                       className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-600 hover:bg-teal-100 px-3 py-1.5 rounded-lg text-xs font-medium transition"
                     >
                       <Download size={12} />
                       PDF
-                    </a>
+                    </button>
                   </div>
 
                   <p className="text-xs text-gray-400 mb-2">

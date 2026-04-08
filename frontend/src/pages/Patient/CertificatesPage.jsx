@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../../api/axios.js";
 import { Award, Download, Calendar, Shield } from "lucide-react";
+import { downloadFile } from "../../utils/download.js";
 
 const CertificatesPage = () => {
   const [certificates, setCertificates] = useState([]);
@@ -82,15 +83,13 @@ const CertificatesPage = () => {
                         </p>
                       </div>
                     </div>
-                    <a
-                      href={`http://localhost:3000/api/certificates/${cert.id}/pdf`}
-                      target="_blank"
-                      rel="noreferrer"
+                    <button
+                      onClick={() => downloadFile(`/certificates/${cert.id}/pdf`, `certificate-${cert.id.slice(0, 8)}.pdf`)}
                       className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-600 hover:bg-teal-100 px-3 py-1.5 rounded-lg text-xs font-medium transition"
                     >
                       <Download size={12} />
                       PDF
-                    </a>
+                    </button>
                   </div>
                 </div>
                 <div className="p-5 space-y-3">

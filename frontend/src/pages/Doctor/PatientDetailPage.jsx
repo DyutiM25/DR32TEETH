@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { downloadFile } from "../../utils/download.js";
 
 const PatientDetailPage = () => {
   const { patientId } = useParams();
@@ -131,7 +132,12 @@ const PatientDetailPage = () => {
                       <div key={p.id} className="bg-white rounded-lg p-3 border border-gray-100">
                         <div className="flex items-center justify-between mb-2">
                           <p className="text-[9px] text-gray-400 uppercase font-medium">Prescription</p>
-                          <a href={`http://localhost:3000/api/prescriptions/${p.id}/pdf`} target="_blank" rel="noreferrer" className="text-[10px] text-teal-600 hover:text-teal-700 font-medium"><FileText size={10} className="inline mr-1" />PDF</a>
+                          <button 
+                            onClick={() => downloadFile(`/prescriptions/${p.id}/pdf`, `prescription-${p.id.slice(0, 8)}.pdf`)}
+                            className="text-[10px] text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1"
+                          >
+                            <FileText size={10} />PDF
+                          </button>
                         </div>
                         {(Array.isArray(p.medicines) ? p.medicines : []).map((med, i) => (
                           <div key={i} className="text-xs text-gray-700 flex gap-2"><span className="font-medium">{med.name}</span><span className="text-gray-400">{med.dosage} • {med.frequency} • {med.duration}</span></div>

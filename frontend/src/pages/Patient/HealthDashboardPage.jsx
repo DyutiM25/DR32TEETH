@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { downloadFile } from "../../utils/download.js";
 
 const HealthDashboardPage = () => {
   const [consultations, setConsultations] = useState([]);
@@ -200,15 +201,13 @@ const HealthDashboardPage = () => {
                               <span className="text-xs text-gray-400">
                                 {new Date(p.createdAt).toLocaleDateString()}
                               </span>
-                              <a
-                                href={`http://localhost:3000/api/prescriptions/${p.id}/pdf`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1 text-xs text-teal-600 hover:text-teal-700 font-medium"
+                              <button
+                                onClick={() => downloadFile(`/prescriptions/${p.id}/pdf`, `prescription-${p.id.slice(0, 8)}.pdf`)}
+                                className="inline-flex items-center gap-1 text-xs text-teal-600 hover:text-teal-700 font-medium cursor-pointer"
                               >
                                 <FileText size={12} />
                                 Download PDF
-                              </a>
+                              </button>
                             </div>
                             <div className="space-y-1">
                               {(Array.isArray(p.medicines) ? p.medicines : []).map((med, i) => (
