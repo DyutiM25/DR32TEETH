@@ -9,6 +9,7 @@ const ServicesCard = ({ title, description, image, bgColor }) => {
           src={image}
           alt={title}
           className="w-full h-56 md:h-48 object-cover rounded-md mb-3 md:mb-4"
+          loading="lazy"
         />
       )}
       <h5 className="text-lg md:text-xl font-semibold mb-2 text-teal-700">{title}</h5>

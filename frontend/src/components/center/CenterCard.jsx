@@ -6,6 +6,7 @@ const CenterCard = ({ alt, image, bgColor  }) => {
           src={image}
           alt={alt}
           className="w-full h-100 object-cover"
+          loading="lazy"
         />
       )}
     </div>
