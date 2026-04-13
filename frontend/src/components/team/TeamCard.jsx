@@ -9,6 +9,7 @@ const TeamCard = ({name, title, description, image}) => {
           src={image}
           alt={name}
           className="w-full aspect-[4/3] object-cover rounded-md mb-3 md:mb-4"
+          loading="lazy"
         />
       )}
       <p className="text-lg md:text-xl font-semibold mb-1 md:mb-2 text-teal-700">{name}</p>

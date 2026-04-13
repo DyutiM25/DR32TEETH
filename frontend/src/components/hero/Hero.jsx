@@ -5,7 +5,7 @@ import Hero1 from "../../assets/images/hero-1.png";
 
 const Hero = () => {
   return (
-    <section id="hero" className="flex flex-col md:flex-row items-center justify-between gap-8 px-4 sm:px-6 md:px-16 py-8 md:py-12 min-h-[80vh] bg-white">
+    <section id="hero" className="flex flex-col md:flex-row items-center justify-between gap-8 px-4 sm:px-6 md:px-24 py-8 md:py-12 min-h-[80vh] bg-white">
       {/* Text Section */}
       <div className="flex-1 space-y-6 md:space-y-8 max-w-xl">
         <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] bg-gradient-to-r from-teal-500 to-orange-400 text-transparent bg-clip-text pb-[12px]">
