@@ -2,3 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-height, 0px) + 16px);
+}
