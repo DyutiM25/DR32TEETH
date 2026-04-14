@@ -8,14 +8,14 @@ This is the backend server for the DR32TEETH platform, built using Node.js, Expr
 - **Appointment System**: API endpoints for booking, canceling, and managing medical appointments.
 - **Consultations**: Manage patient-doctor interactions and history.
 - **Document Generation**: Automated PDF generation for prescriptions and medical certificates using `PDFKit`.
-- **Database Management**: Seamless data handling with Prisma ORM and PostgreSQL.
+- **Database Management**: Seamless data handling with Prisma ORM and MySQL.
 - **Caching**: Redis integration for session management and performance optimization.
 
 ## 🛠️ Tech Stack
 
 - **Framework**: Express.js
 - **Runtime**: Node.js
-- **Database**: PostgreSQL
+- **Database**: MySQL
 - **ORM**: Prisma
 - **Cache**: Redis
 - **Security**: bcryptjs for hashing, JWT for token management
@@ -44,11 +44,10 @@ backend/
 2. **Environment Variables**
    Create a `.env` file in the root of the `backend` directory:
    ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/dr32teeth"
-   DIRECT_URL="postgresql://user:password@localhost:5432/dr32teeth"
-   JWT_ACCESS_SECRET="your_secret_key"
+   DATABASE_URL="mysql://user:password@localhost:3306/dr32teeth"
+   JWT_SECRET="your_secret_key"
    REDIS_URL="redis://localhost:6379"
-   PORT=3000
+   PORT=5000
    ```
 
 3. **Database Setup**

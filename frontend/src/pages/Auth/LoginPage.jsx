@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import api from "../../api/axios.js";
 import logo from "../../assets/images/header.png";
 
@@ -125,9 +124,7 @@ const LoginPage = () => {
     <div className="flex min-h-screen bg-[#ccf2ed]">
       {/* Left Section */}
       <div className="hidden md:flex flex-1 flex-col justify-center items-center bg-[#ccf2ed]">
-        <Link to="/" className="flex flex-col items-center mb-6">
         <img src={logo} alt="Dr.32 Teeth" className="w-48 mb-4 border rounded-2xl shadow-sm" />
-        </Link>
         <h2 className="text-2xl font-semibold text-gray-700 text-center">
           Your Smile, Our Priority
         </h2>

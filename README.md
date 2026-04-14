@@ -29,7 +29,7 @@ DR32TEETH is a comprehensive healthcare management platform designed to streamli
 
 ### Backend
 - **Node.js** & **Express** for a scalable API.
-- **Prisma ORM** with **PostgreSQL** for robust data management.
+- **Prisma ORM** with **MySQL** for robust data management.
 - **Redis** for efficient caching and session management.
 - **PDFKit** for high-quality document generation.
 
@@ -45,46 +45,8 @@ dr32teeth/
 
 ### Prerequisites
 - Node.js (v18+)
-- PostgreSQL
+- MySQL
 - Redis
-
-## ▶️ Run Locally
-
-### Backend env
-Create `backend/.env` with:
-
-```env
-DATABASE_URL="postgresql://user:password@localhost:5432/dr32teeth"
-DIRECT_URL="postgresql://user:password@localhost:5432/dr32teeth"
-JWT_ACCESS_SECRET="your_secret_key"
-REDIS_URL="redis://localhost:6379"
-PORT=3000
-```
-
-### Frontend env
-Create `frontend/.env` with:
-
-```env
-VITE_API_BASE_URL="http://localhost:3000/api"
-```
-
-### Start the app
-
-1. Start the backend:
-   ```bash
-   cd backend
-   npm install
-   npx prisma generate
-   npx prisma db push
-   npm run dev
-   ```
-
-2. Start the frontend in a second terminal:
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
 
 ### Installation
 
