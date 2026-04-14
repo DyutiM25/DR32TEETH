@@ -29,7 +29,7 @@ DR32TEETH is a comprehensive healthcare management platform designed to streamli
 
 ### Backend
 - **Node.js** & **Express** for a scalable API.
-- **Prisma ORM** with **MySQL** for robust data management.
+- **Prisma ORM** with **PostgreSQL** for robust data management.
 - **Redis** for efficient caching and session management.
 - **PDFKit** for high-quality document generation.
 
@@ -45,7 +45,7 @@ dr32teeth/
 
 ### Prerequisites
 - Node.js (v18+)
-- MySQL
+- PostgreSQL
 - Redis
 
 ### Installation
