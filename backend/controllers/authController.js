@@ -30,7 +30,7 @@ function createAccessToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email },
     process.env.JWT_ACCESS_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || "1d" }
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || "1d" },
   );
 }
 
@@ -83,7 +83,7 @@ export const verifyOtp = async (req, res) => {
         data: {
           email,
           role: "patient",
-        }
+        },
       });
       isNewUser = true;
     }
@@ -98,9 +98,10 @@ export const verifyOtp = async (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 1000 * 60 * 60 * 24,
     };
+
     res.cookie("token", accessToken, cookieOptions);
 
     res.json({
@@ -156,13 +157,25 @@ export const getProfile = async (req, res) => {
 // 4) update profile (protected)
 export const updateProfile = async (req, res) => {
   try {
-    const { firstName, lastName, gender, bloodGroup, phone, specialization, qualification, licenseNumber } = req.body;
+    const {
+      firstName,
+      lastName,
+      gender,
+      bloodGroup,
+      phone,
+      specialization,
+      qualification,
+      licenseNumber,
+    } = req.body;
 
-    const existingUser = await prisma.user.findUnique({ where: { id: req.user.id } });
+    const existingUser = await prisma.user.findUnique({
+      where: { id: req.user.id },
+    });
     if (!existingUser) return res.status(404).json({ error: "User not found" });
 
     // Mark profile as completed if key fields are filled
-    const isCompleted = !!(firstName && lastName && phone) || existingUser.profileCompleted;
+    const isCompleted =
+      !!(firstName && lastName && phone) || existingUser.profileCompleted;
 
     const updateData = {
       firstName: firstName !== undefined ? firstName : undefined,
@@ -170,19 +183,20 @@ export const updateProfile = async (req, res) => {
       gender: gender !== undefined ? gender : undefined,
       bloodGroup: bloodGroup !== undefined ? bloodGroup : undefined,
       phone: phone !== undefined ? phone : undefined,
-      profileCompleted: isCompleted
+      profileCompleted: isCompleted,
     };
 
     // Doctor-specific fields
     if (existingUser.role === "doctor") {
-      if (specialization !== undefined) updateData.specialization = specialization;
+      if (specialization !== undefined)
+        updateData.specialization = specialization;
       if (qualification !== undefined) updateData.qualification = qualification;
       if (licenseNumber !== undefined) updateData.licenseNumber = licenseNumber;
     }
 
     const user = await prisma.user.update({
       where: { id: req.user.id },
-      data: updateData
+      data: updateData,
     });
 
     res.json({
@@ -215,10 +229,14 @@ export const registerAsDoctor = async (req, res) => {
     const { specialization, qualification, licenseNumber } = req.body;
 
     if (!specialization || !qualification || !licenseNumber) {
-      return res.status(400).json({ error: "Specialization, qualification, and license number are required" });
+      return res.status(400).json({
+        error: "Specialization, qualification, and license number are required",
+      });
     }
 
-    const existingUser = await prisma.user.findUnique({ where: { id: req.user.id } });
+    const existingUser = await prisma.user.findUnique({
+      where: { id: req.user.id },
+    });
     if (!existingUser) return res.status(404).json({ error: "User not found" });
 
     if (existingUser.role === "doctor") {
@@ -232,8 +250,8 @@ export const registerAsDoctor = async (req, res) => {
         isApproved: false,
         specialization,
         qualification,
-        licenseNumber
-      }
+        licenseNumber,
+      },
     });
 
     res.json({
@@ -257,7 +275,14 @@ export const registerAsDoctor = async (req, res) => {
 // 6) logout
 export const logout = async (req, res) => {
   try {
-    res.clearCookie(process.env.COOKIE_NAME || "token");
+    const cookieName = process.env.COOKIE_NAME || "token";
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    };
+
+    res.clearCookie(cookieName, cookieOptions);
     res.json({ message: "Logged out" });
   } catch (err) {
     console.error(err);
