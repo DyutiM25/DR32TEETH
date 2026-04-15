@@ -69,3 +69,219 @@ Top procedures: group by consultation type or treatment plan procedure
 Repeat patient rate: patients with >1 completed appointment / total patients
 Revenue trend: sum of paid invoices by month (if billing is added)
 Display with Recharts or Chart.js on the admin dashboard — already in your React stack
+
+
+Dyuti Update - 15 April 2026
+Today you took the project from “works locally” to a real deployed full-stack app.
+
+At a high level, you:
+- fixed local OTP/login issues
+- separated frontend and backend deployment properly
+- deployed the backend on Render
+- provisioned Redis and Postgres on Render
+- connected Netlify frontend to the Render backend
+- fixed cross-domain authentication so login works in production
+- applied Prisma migrations to the production database
+
+**Project/Code Changes**
+You updated the app in a few important areas.
+
+Backend auth and infrastructure:
+- changed Redis from a hardcoded local URL to an environment-based URL using `REDIS_URL`
+- fixed cookie settings for production so Netlify frontend and Render backend can share auth correctly
+- updated logout to clear the cookie with matching options
+- kept JWT auth flow working through HTTP-only cookies
+
+Frontend API config:
+- updated Axios so it uses `VITE_API_BASE_URL`
+- kept `withCredentials: true` so cookies are sent with requests
+- fixed local dev API behavior so it points to the correct backend port
+- improved OTP error display so the frontend can show backend error messages instead of a generic fallback
+
+Backend CORS:
+- allowed your frontend origin from Netlify
+- kept local dev origins enabled too
+
+**Deployment Architecture You Set Up**
+Your app is now effectively split like this:
+
+- Frontend: `Netlify`
+- Backend API: `Render Web Service`
+- Database: `Render Postgres`
+- OTP/session storage: `Render Key Value` / Redis
+
+That is the right architecture for this type of project.
+
+**Netlify Deployment**
+Originally, Netlify was only deploying your frontend because your build command was:
+
+```bash
+cd frontend && npm install && npm run build
+```
+
+That means Netlify was:
+- building the React app
+- serving static frontend files
+- not hosting the Express backend
+
+You then connected the frontend to the deployed backend by setting:
+
+```env
+VITE_API_BASE_URL=https://dr32teeth.onrender.com/api
+```
+
+This was important because your frontend code calls routes like:
+- `/auth/send-otp`
+- `/auth/verify-otp`
+- `/auth/profile`
+
+and those need the `/api` prefix because your backend mounts routes under `/api/...`.
+
+Without that env var, the frontend fell back to `"/api"` and Netlify returned a 404 page.
+
+**Render Backend Deployment**
+You chose the correct Render service type:
+
+- `Web Service`
+
+That was correct because your backend is a long-running Express server, not a static site or cron job.
+
+Then you configured Render to build from the backend folder. The important setup was:
+- Root Directory: `backend`
+- Build Command: `npm ci && npx prisma generate && npx prisma migrate deploy`
+- Start Command: `npm start`
+
+Why these mattered:
+- `Root Directory=backend` told Render where your actual backend code lives
+- `npm ci` ensured exact dependency versions from `package-lock.json`
+- `prisma generate` built the Prisma client
+- `prisma migrate deploy` created the production DB tables from your migration files
+- `npm start` launched the Express server
+
+**Prisma/Dependency Issues You Solved**
+You ran into a Prisma 7 vs Prisma 6 mismatch on Render.
+
+What happened:
+- Render was trying to use Prisma 7
+- your schema was written in Prisma 6 format
+- Prisma 7 rejected `url` and `directUrl` in `schema.prisma`
+
+You fixed that by:
+- pinning Prisma versions properly
+- making sure the correct Prisma packages were installed during Render build
+- using a build flow that worked with your current Prisma schema
+
+Then later, after the backend connected to Postgres, you hit:
+- `The table public.user does not exist`
+
+That meant the DB was connected, but empty.  
+You fixed that by running migrations during the build with:
+
+```bash
+npx prisma migrate deploy
+```
+
+That created the tables in the Render database.
+
+**Redis / OTP Setup**
+Your OTP system depends on Redis:
+- OTP is generated
+- stored with a 5-minute TTL
+- then checked during verification
+
+Originally, the code used:
+```js
+redis://localhost:6379
+```
+
+That only works on your own machine if Redis is running locally.
+
+In production, Render doesn’t have your laptop’s Redis, so you:
+- created a Render `Key Value` store
+- copied its Redis URL
+- stored it as `REDIS_URL`
+- updated the backend to use `process.env.REDIS_URL`
+
+That made OTP storage work in production.
+
+**Postgres Setup**
+Your backend originally tried to connect to:
+```txt
+127.0.0.1:5432
+```
+
+That only works locally. On Render, you created a `Postgres` database and used its connection URL for:
+- `DATABASE_URL`
+- `DIRECT_URL`
+
+This allowed Prisma to connect to the hosted production database.
+
+**Cross-Domain Auth Fix**
+One of the most important deployment fixes you made was around cookies.
+
+Why it mattered:
+- frontend is on Netlify
+- backend is on Render
+- these are different domains
+- browsers block many cookies across domains unless configured correctly
+
+You updated the cookie config so in production it uses:
+- `secure: true`
+- `sameSite: "none"`
+
+That is what allows the browser to send the auth cookie from the Netlify frontend to the Render backend.
+
+You also made sure:
+- Axios has `withCredentials: true`
+- backend CORS has `credentials: true`
+- backend CORS includes your Netlify domain
+
+Without all 3 of these, login would fail.
+
+**Environment Variables You Worked With**
+On Render backend, the important env vars became:
+- `DATABASE_URL`
+- `DIRECT_URL`
+- `REDIS_URL`
+- `JWT_ACCESS_SECRET`
+- `GOOGLE_APP_PASSWORD`
+- `NODE_ENV=production`
+
+On Netlify frontend, the key env var became:
+- `VITE_API_BASE_URL=https://dr32teeth.onrender.com/api`
+
+You also clarified that:
+- `NODE_ENV=production` is important on Render backend
+- it is not something you really need to set manually on Netlify frontend
+
+**Problems You Diagnosed Today**
+You worked through several real deployment/debugging issues:
+
+- frontend calling wrong backend port locally
+- local frontend blocked by backend CORS
+- frontend showing generic OTP errors instead of real backend errors
+- Render build path/root directory confusion
+- Prisma version mismatch during build
+- backend crashing because database URL still pointed to localhost
+- OTP verification failing because production DB tables didn’t exist
+- Netlify returning 404 because frontend API base URL was missing `/api`
+- cross-site cookie config needing `sameSite: "none"`
+
+That’s a lot of meaningful full-stack debugging, and honestly it’s exactly the kind of real engineering work worth talking about in interviews.
+
+**What You Achieved**
+By the end of today, you turned this into a deployed full-stack app with:
+- static frontend hosting
+- backend API hosting
+- hosted Postgres
+- hosted Redis
+- production environment configuration
+- cross-site auth
+- Prisma-backed production schema
+
+That is a big milestone.
+
+If you want, I can turn this into:
+- a concise “work log” for your notes
+- a resume-style bullet list
+- or a polished LinkedIn/project-description version of what you accomplished today.
