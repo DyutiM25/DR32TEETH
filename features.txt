@@ -1,0 +1,71 @@
+Dynamic scheduling system
+Let doctors define weekly availability (e.g. Mon 9-12, Wed 14-18) in a schedule config table
+Add break blocks and one-off leave days that block slot generation
+Generate bookable slots dynamically from schedule — no more hardcoded 09:00–17:00
+Prevent double-booking with a DB-level unique constraint on (doctorId, datetime)
+Add slot duration config per doctor (15/30/45/60 min appointments)
+Resume bullet: 'Built conflict-free appointment scheduling engine with doctor-configurable availability, slot duration, break blocks, and leave management'
+
+Treatment plan tracking
+New TreatmentPlan table: patient, doctor, procedure name, total sessions, start date
+TreatmentSession table linked to plan: session number, date, notes, status (pending/done/missed)
+Doctor view: see all active plans + progress per patient (e.g. 'Root canal: 2/4 sessions done')
+Patient view: treatment timeline with upcoming sessions
+Attach each consultation to a session to keep records linked
+Resume bullet: 'Designed multi-visit treatment plan system with session-level progress tracking, supporting complex procedures like orthodontics and implants'
+
+Patient file uploads
+Use multer (Express) + store files in S3, Cloudinary, or local /uploads with signed URLs
+PatientFile table: patientId, appointmentId (optional), fileType (xray/report/insurance), url, uploadedBy, uploadedAt
+Doctors can upload during or after consultation
+Patients can upload insurance docs or prior reports at booking
+Admin can view all files per patient
+Resume bullet: 'Implemented secure multi-type file upload system (X-rays, reports, insurance) with role-scoped access and per-appointment attachment support'
+
+Notifications engine
+Use Nodemailer (free SMTP) or Resend/SendGrid for email — pick one and ship it
+Trigger points: appointment booked, appointment confirmed, appointment cancelled, prescription ready, doctor approved
+Add a Notification table to log all sent notifications (type, recipient, status, sentAt)
+Optional: add Twilio for SMS — just one or two templates is enough to mention it
+Queue notifications with a simple setTimeout or a lightweight job like node-cron
+Resume bullet: 'Built event-driven notification system triggering email reminders on booking, cancellation, and prescription events, with delivery logging'
+
+Audit logs + security hardening
+AuditLog table: userId, role, action (e.g. 'APPOINTMENT_STATUS_CHANGED'), targetId, oldValue (JSON), newValue (JSON), timestamp, ip
+Log every status change, approval, document issue, and user edit via a middleware helper
+Add refresh tokens: short-lived access token (15min) + httpOnly cookie refresh token (7d)
+Rate limiting with express-rate-limit on auth routes (login, register) and sensitive endpoints
+Input validation with zod or express-validator on all request bodies
+Resume bullet: 'Implemented full audit trail with immutable action logs, and hardened API with refresh token rotation, rate limiting, and request validation'
+
+Billing and invoices
+Invoice table: appointmentId, items (JSON array of {description, amount}), total, status (unpaid/paid/waived)
+Doctor sets consultation fee in their profile; auto-populate invoice on consultation complete
+Admin dashboard shows revenue by doctor/month and outstanding invoices
+Generate PDF invoice using your existing PDF generation setup
+Payment status update (manual for now — no gateway needed for resume purposes)
+Resume bullet: 'Built invoice generation system with per-doctor fee configuration, PDF export, and admin revenue reporting'
+
+Search and filtering
+Patients list: search by name, phone, email — add ?search= param to API
+Appointments list: filter by doctor, date range, status (pending/confirmed/completed/cancelled)
+Prescriptions: filter by diagnosis keyword, medicine name, date range
+Use Prisma's 'where' with 'contains' for text search — no full-text engine needed
+Add debounced search inputs on the frontend with URL state sync
+Resume bullet: 'Added multi-field search and filter APIs across patients, appointments, and prescriptions with frontend debounce and URL-persisted state'
+
+Real-time queue / waiting room
+Use Socket.io — add it to your Express server alongside REST routes
+Queue table or in-memory map: today's appointments by doctor with status (waiting/in-progress/done)
+Doctor sees live queue that updates when receptionist/admin moves a patient to 'in progress'
+Patient gets a token number and sees estimated wait time
+Emit socket events on appointment status changes — one emitter, multiple listeners
+Resume bullet: 'Implemented real-time clinic queue using WebSockets, enabling live patient status updates for doctors and reception without page refresh'
+
+Analytics that matter
+Appointment no-show rate: count appointments with status 'no-show' / total booked, by month
+Doctor workload: appointments completed per doctor per week, avg session duration
+Top procedures: group by consultation type or treatment plan procedure
+Repeat patient rate: patients with >1 completed appointment / total patients
+Revenue trend: sum of paid invoices by month (if billing is added)
+Display with Recharts or Chart.js on the admin dashboard — already in your React stack

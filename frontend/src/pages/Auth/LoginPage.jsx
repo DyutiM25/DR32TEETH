@@ -45,7 +45,9 @@ const LoginPage = () => {
       setResendTimer(30);
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to send OTP. Please try again.",
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to send OTP. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -86,7 +88,11 @@ const LoginPage = () => {
       await api.post("/auth/send-otp", { email });
       setResendTimer(30);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to resend OTP.");
+      setError(
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to resend OTP.",
+      );
     } finally {
       setLoading(false);
     }
