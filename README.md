@@ -1,5 +1,7 @@
 # DR32TEETH - Healthcare Management System
 
+Checkout the project live at: https://dr32teeth.netlify.app/ 
+
 DR32TEETH is a comprehensive healthcare management platform designed to streamline the workflow between patients, doctors, and administrators. It provides a robust set of tools for appointment scheduling, digital prescriptions, medical certificates, and role-based dashboard management.
 
 ## 🚀 Key Features
