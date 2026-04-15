@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import api from "../../api/axios.js";
 import logo from "../../assets/images/header.png";
 
@@ -43,7 +44,11 @@ const LoginPage = () => {
       setStep("otp");
       setResendTimer(30);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to send OTP. Please try again.");
+      setError(
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to send OTP. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -61,7 +66,7 @@ const LoginPage = () => {
 
     try {
       const data = await login(email, otpString);
-      
+
       // If new account or profile not completed, go to profile page
       if (data.isNewUser || !data.user.profileCompleted) {
         navigate("/profile");
@@ -83,7 +88,11 @@ const LoginPage = () => {
       await api.post("/auth/send-otp", { email });
       setResendTimer(30);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to resend OTP.");
+      setError(
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to resend OTP.",
+      );
     } finally {
       setLoading(false);
     }
@@ -109,7 +118,10 @@ const LoginPage = () => {
 
   const handleOtpPaste = (e) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    const pastedData = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
     if (pastedData.length === 0) return;
     const newOtp = [...otp];
     for (let i = 0; i < 6; i++) {
@@ -124,12 +136,19 @@ const LoginPage = () => {
     <div className="flex min-h-screen bg-[#ccf2ed]">
       {/* Left Section */}
       <div className="hidden md:flex flex-1 flex-col justify-center items-center bg-[#ccf2ed]">
-        <img src={logo} alt="Dr.32 Teeth" className="w-48 mb-4 border rounded-2xl shadow-sm" />
+        <Link to="/" className="mb-6">
+          <img
+            src={logo}
+            alt="Dr.32 Teeth"
+            className="w-48 mb-4 border rounded-2xl shadow-sm"
+          />
+        </Link>
         <h2 className="text-2xl font-semibold text-gray-700 text-center">
           Your Smile, Our Priority
         </h2>
         <p className="text-gray-600 mt-2 text-center px-8">
-          Enter your email to sign in or create an account. No passwords needed—just a quick OTP!
+          Enter your email to sign in or create an account. No passwords
+          needed—just a quick OTP!
         </p>
       </div>
 
@@ -148,7 +167,8 @@ const LoginPage = () => {
 
           {step === "otp" && (
             <p className="text-center text-gray-500 text-sm">
-              We've sent a 6-digit code to <strong className="text-gray-700">{email}</strong>
+              We've sent a 6-digit code to{" "}
+              <strong className="text-gray-700">{email}</strong>
             </p>
           )}
 
@@ -162,7 +182,9 @@ const LoginPage = () => {
           {step === "email" && (
             <form onSubmit={handleSendOtp} className="space-y-5">
               <div>
-                <label className="block text-gray-700 mb-1 font-medium">Email Address</label>
+                <label className="block text-gray-700 mb-1 font-medium">
+                  Email Address
+                </label>
                 <input
                   id="login-email"
                   type="email"
@@ -192,9 +214,12 @@ const LoginPage = () => {
                 <label className="block text-gray-700 mb-3 font-medium text-center">
                   Enter Verification Code
                 </label>
-                <div className="flex justify-center gap-2" onPaste={handleOtpPaste}>
+                <div
+                  className="flex justify-center gap-2"
+                  onPaste={handleOtpPaste}
+                >
                   {otp.map((digit, index) => (
-                     <input
+                    <input
                       key={index}
                       id={`login-otp-${index}`}
                       ref={(el) => (otpRefs.current[index] = el)}
